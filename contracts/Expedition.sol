@@ -1,31 +1,62 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.9.0; //Version de solidity
+pragma solidity >=0.4.22 <0.9.0;
 
-contract Shipping { //Creation du contrat
+// Déclaration contrat
+contract contractEnvoieColis{
 
-    enum Etat{ Pending, Shipped, Delivered } // Definition des 3 etats
-    Etat etatcommande;    
-    event Attente(uint ID, Etat); //creation des evenements
-    event Expedition(uint ID, Etat);
-    event Livraison(uint ID, Etat);
+    // Déclaration de l'état du colis 
+    enum Etat{ Pending, Shipped, Delivered }
+        Etat etat;
 
-    struct Commande { //definition d'une commande
-        uint ID;
-        string State;
-    }
-    function _creationcommande(uint ID) private { //fonction de création 
-        etatcommande = Etat.Pending;
-        emit Attente(ID, etatcommande); //Appel de l'evenement de creation 
-    }
-
-    function _expeditioncommande(uint ID) private { //Fonction d'expedition
-        etatcommande = Etat.Shipped;
-        emit Expedition(ID, etatcommande); //Appel de l'evenement d'expedition 
+    // Déclaration de la structure 
+    struct Marchandise{
+        bytes32 name;
+        uint numero_id;
+        uint heureDepart;
+        uint heureEnvoie;
+        uint heureArrive;
+        Etat etat;
     }
 
-    function _livraisoncommande(uint ID) private { //fonction de livraison 
-        etatcommande = Etat.Delivered;
-        emit Livraison(ID, etatcommande); //Appel de l'evenement de livraison 
-    }
+    // Déclaration de l'event Création
+    event Creation(
+        Etat choix
+    );
+
+    // Déclaration de l'event Création
+    event Expedition (
+        Etat choix
+    );
+
+    // Déclaration de l'event Création
+    event Execution (
+        Etat choix
+    );
+
+    // Création de la marchandise
+    Marchandise marchandise;
+
+    // Déclaration de la fonction Start, au depart le colis n'a pas d'heure d'arrivee
+    function Start(uint id, bytes32 name) public{
     
-} 
+        marchandise.etat = Etat.Pending;
+        marchandise.name = name;
+        marchandise.numero_id = id;
+        marchandise.heureDepart = block.timestamp;
+        emit Creation(etat);
+    }
+
+    // Focntion d'envoie du colis
+    function Envoie() public{
+        marchandise.etat = Etat.Shipped;
+        marchandise.heureEnvoie = block.timestamp;
+        emit Expedition(etat);
+    }
+
+    // Fonction d'arrivée du colis
+    function Fin() public{
+        marchandise.etat = Etat.Delivered;
+        marchandise.heureArrive = block.timestamp;
+        emit Execution(etat);
+    }
+}
